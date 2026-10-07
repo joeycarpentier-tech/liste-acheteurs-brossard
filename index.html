@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <link rel="icon" href="data:," />
+  <title>Liste d'acheteurs en attente</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+    :root { color-scheme: light; --bg:#f1f2f3; --panel:#fff; --soft:#f6f6f6; --ink:#15191b; --muted:#5d6569; --line:#d7dadd; --navy:#202529; --accent:#c3002f; --accent-soft:#ffccd6; --green:#187849; --green-bg:#def2e7; --amber:#8a5b00; --amber-bg:#fff0c5; --red:#c3002f; --red-bg:#f8e1e7; --blue:#225f86; --blue-bg:#e0eef7; --shadow:0 14px 34px rgba(20,24,26,.09); }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.45}button,input,select{font:inherit;color:inherit}.page{width:min(1180px,calc(100% - 32px));margin:auto;padding:28px 0 54px}
+    .hero{max-width:820px;margin-bottom:22px}.hero h1{margin:0;font:700 clamp(2.35rem,5vw,4.2rem)/.96 "Barlow Condensed",sans-serif;letter-spacing:-.025em}.hero h1 span{color:var(--accent)}.hero p{margin:11px 0 0;color:var(--muted);max-width:700px;font-size:.98rem}
+    .setup{background:var(--amber-bg);border:1px solid #e0c46a;color:var(--amber);padding:12px 16px;font-weight:700;font-size:.85rem;margin-bottom:17px}
+    .view-tabs{display:flex;gap:7px;margin-bottom:17px}.view-tab{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--panel);padding:10px 13px;border-radius:3px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(20,24,26,.05)}.view-tab span{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--soft);color:var(--muted);font-size:.72rem}.view-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}.view-tab.active span{background:#fff;color:var(--navy)}.view-tab:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);outline-offset:2px}.view[hidden]{display:none!important}
+    .scan{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:700;font-size:.8rem}.scan:before{content:"";width:8px;height:8px;background:var(--muted);border-radius:50%}.match-badge{display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.7rem;padding:5px 7px;letter-spacing:.025em;text-decoration:none}.match-badge:hover,.match-badge:focus-visible{text-decoration:underline;text-underline-offset:2px}.match-badge:focus-visible,.status:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);outline-offset:2px}.stock{color:var(--muted);font-size:.72rem}.activix-link{color:var(--blue);font-weight:800;text-decoration:underline;text-underline-offset:2px}.owner{margin-top:10px;font-size:.76rem;color:var(--muted)}.match-pill{display:inline-block;margin-top:8px;background:var(--accent);color:#fff;font-weight:800;font-size:.76rem;padding:7px 12px;border:0;border-radius:3px;cursor:pointer}.match-pill:hover{background:var(--navy)}.modal-overlay{position:fixed;inset:0;background:rgba(20,24,26,.55);display:none;align-items:center;justify-content:center;z-index:20;padding:18px}.modal-overlay.open{display:flex}.modal{background:#fff;max-width:560px;width:100%;max-height:82vh;overflow:auto;box-shadow:var(--shadow);border-top:6px solid var(--accent)}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.modal-head h3{margin:0;font:700 1.4rem "Barlow Condensed",sans-serif}.modal-close{border:1px solid var(--line);background:var(--soft);padding:6px 10px;font-weight:800;cursor:pointer;border-radius:3px}.modal-body{padding:8px 18px 18px}.modal-match{padding:12px 0;border-bottom:1px solid var(--line)}.modal-match:last-child{border-bottom:0}.modal-match h4{margin:0 0 3px;font-size:.92rem}.modal-match .spec{color:var(--muted);font-size:.8rem}.modal-match .stock{color:var(--muted);font-size:.72rem}.modal-match .match-badge{margin-top:8px;display:inline-block}.record-action.armed{background:#b71c1c;color:#fff;border-color:#b71c1c}.analyze-btn{display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;padding:9px 14px;border:0;cursor:pointer}.analyze-btn:disabled{opacity:.55;cursor:default}
+    .workspace{display:grid;grid-template-columns:380px minmax(0,1fr);gap:17px}.card{background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow)}.form-card{padding:20px;align-self:start}.section-sub{margin:4px 0 18px;color:var(--muted);font-size:.83rem}.field{margin-bottom:13px}.field label{display:block;font-size:.76rem;font-weight:700;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--soft);padding:9px 10px;border-radius:3px;outline:none}.field textarea{min-height:76px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.primary{width:100%;border:0;background:var(--navy);color:#fff;padding:11px;font-weight:800;cursor:pointer;margin-top:4px;border-radius:3px}.primary:hover{background:var(--accent)}.primary:disabled{opacity:.5;cursor:not-allowed}.form-note{margin:10px 0 0;color:var(--muted);font-size:.7rem}.success{display:none;margin-top:11px;padding:10px;background:var(--green-bg);color:var(--green);font-size:.8rem;font-weight:700}.form-error{display:none;margin-top:11px;padding:10px;background:var(--red-bg);color:var(--red);font-size:.8rem;font-weight:700}
+    .list-card{overflow:hidden}.results{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 18px;background:var(--navy);color:#fff}.result-total{display:flex;align-items:baseline;gap:10px}.result-total strong{font:700 2.2rem "Barlow Condensed",sans-serif;color:#fff}.result-total span{font-weight:700}.results p{margin:0;color:#d7dadd;font-size:.75rem;max-width:280px;text-align:right}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border-bottom:1px solid var(--line)}.toolbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.filters{display:flex;gap:5px;flex-wrap:wrap}.filter{border:1px solid var(--line);background:var(--soft);padding:7px 9px;border-radius:3px;font-size:.77rem;font-weight:700;cursor:pointer}.filter.active{background:var(--navy);color:#fff;border-color:var(--navy)}.search{width:min(230px,100%);border:1px solid var(--line);background:var(--soft);padding:8px 10px;border-radius:3px}.record{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(120px,.55fr) auto;gap:14px;padding:15px;border-bottom:1px solid var(--line);align-items:center}.record:last-child{border-bottom:0}.record h3{margin:0;font-size:.9rem}.record p{margin:3px 0 0;color:var(--muted);font-size:.76rem}.record .seller{font-size:.77rem}.record .seller small{display:block;color:var(--muted)}.record-side{display:flex;align-items:flex-end;flex-direction:column;gap:8px}.record-actions{display:flex;gap:5px}.record-action{border:1px solid var(--line);background:var(--soft);padding:6px 8px;border-radius:3px;font-size:.68rem;font-weight:800;cursor:pointer}.record-action.sale{border-color:var(--green);background:var(--green-bg);color:var(--green)}.record-action.remove{color:var(--red)}.record-action:hover,.record-action:focus-visible{border-color:currentColor}.status{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;font-size:.7rem;font-weight:800;white-space:nowrap;text-decoration:none}.status[href]:hover{text-decoration:underline;text-underline-offset:2px}.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}.status.exact{background:var(--green-bg);color:var(--green)}.status.near{background:var(--amber-bg);color:var(--amber)}.status.potential{background:var(--blue-bg);color:var(--blue)}.status.wait{background:var(--soft);color:var(--muted)}.empty{display:none;padding:30px;text-align:center;color:var(--muted)}.sales-view{max-width:800px}.sales-summary{display:flex;align-items:baseline;gap:10px;padding:18px;background:var(--navy);color:#fff}.sales-summary strong{font:700 2.2rem "Barlow Condensed",sans-serif}.sales-summary span{font-weight:700}.resolved{border-top:5px solid var(--green)}.resolved-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;border-bottom:1px solid var(--line)}.resolved-head h2{margin:0;font:700 1.45rem "Barlow Condensed",sans-serif}.resolved-head p{margin:2px 0 0;color:var(--muted);font-size:.75rem}.resolved-count{color:var(--green);font-weight:800;font-size:.8rem}.resolved .record{grid-template-columns:minmax(0,1fr) minmax(120px,.45fr) auto}.resolved .record h3{text-decoration:none}.resolved-date{color:var(--green);font-size:.72rem;font-weight:800}.resolved-empty{padding:24px 17px;color:var(--muted);font-size:.82rem;text-align:center}.undo{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:none;align-items:center;gap:14px;background:var(--navy);color:#fff;padding:11px 13px;box-shadow:var(--shadow);z-index:10;font-size:.8rem}.undo button{border:0;background:transparent;color:#fff;text-decoration:underline;font-weight:800;cursor:pointer}
+    @media(max-width:850px){.workspace{grid-template-columns:1fr}.form-card{order:2}.list-card{order:1}}
+    @media(max-width:560px){.page{width:calc(100% - 22px);padding-top:20px}.hero{margin-bottom:18px}.hero h1{font-size:2.55rem}.hero p{font-size:.92rem}.toolbar{align-items:flex-start;flex-direction:column}.results{align-items:flex-start;flex-direction:column;gap:3px}.results p{text-align:left}.toolbar .search{width:100%}.record,.resolved .record{grid-template-columns:1fr}.record .seller{grid-column:1}.record-side{align-items:flex-start;grid-column:1}.record-actions{width:100%}.record-action{flex:1}.row2{grid-template-columns:1fr}.resolved-head{align-items:flex-start;flex-direction:column}.undo{width:calc(100% - 22px);justify-content:space-between}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<main class="page">
+  <div class="setup" id="setupBanner" hidden>Configuration en cours : la sauvegarde partagée sera activée sous peu.</div>
+  <section class="hero" aria-labelledby="title">
+    <h1 id="title">Demandes et <span>nouveaux arrivages</span></h1>
+    <p>Ajoutez ce que le client recherche. La feuille compare ensuite sa demande aux nouveaux véhicules et indique les matchs.</p>
+  </section>
+
+  <nav class="view-tabs" aria-label="Changer de vue">
+    <button class="view-tab active" type="button" data-view-target="buyersView" aria-pressed="true">Acheteurs en attente <span id="pendingTabCount">0</span></button>
+    <button class="view-tab" type="button" data-view-target="salesView" aria-pressed="false">Ventes conclues <span id="salesTabCount">0</span></button>
+  </nav>
+
+  <div class="view" id="buyersView">
+
+  <section id="buyers" aria-label="Fiches en attente">
+    <div class="workspace">
+      <form class="card form-card" id="buyerForm">
+        <h2 class="section-title">Nouvelle fiche acheteur</h2><p class="section-sub">À créer pendant la visite si le véhicule recherché n'est pas en stock.</p>
+        <div class="field"><label for="client">Nom du client</label><input id="client" required placeholder="Ex. Marc Tremblay"></div>
+        <div class="field"><label for="activix">Lien Activix *</label><input id="activix" required inputmode="url" placeholder="Lien de la fiche Activix (obligatoire)"></div>
+        <div class="field"><label for="model">Modèle recherché</label><input id="model" required placeholder="Ex. Honda HR-V"></div>
+        <div class="row2"><div class="field"><label for="years">Années visées</label><input id="years" required placeholder="2020 à 2023"></div><div class="field"><label for="budget">Budget max.</label><input id="budget" required inputmode="numeric" placeholder="20 000 $"></div></div>
+        <div class="row2"><div class="field"><label for="colors">Couleur(s) acceptée(s)</label><input id="colors" placeholder="Ex. noir, gris ou blanc"></div><div class="field"><label for="maxKm">Kilométrage max.</label><input id="maxKm" inputmode="numeric" placeholder="Ex. 80 000 km"></div></div>
+        <div class="field"><label for="specs">Autres spécifications importantes</label><textarea id="specs" placeholder="Ex. AWD obligatoire, toit ouvrant, 7 passagers…"></textarea></div>
+        <div class="field"><label for="seller">Nom du vendeur</label><select id="seller" required><option value="" selected disabled>Sélectionner un vendeur</option><option>Michel</option><option>Dikran</option><option>Gabriel</option><option>Cedrick</option><option>Antoine</option><option>Joey</option><option>Alfredo</option></select></div>
+        <button class="primary" type="submit">Ajouter à la liste</button><p class="form-note">Les fiches sont sauvegardées dans la feuille partagée et visibles par toute l'équipe.</p><div class="success" id="success">Fiche ajoutée à la liste.</div><div class="form-error" id="formError"></div>
+      </form>
+
+      <div>
+        <div class="card list-card">
+          <div class="results" aria-live="polite"><div class="result-total"><strong id="pendingCount">0</strong><span id="pendingLabel">fiche en attente</span></div><p>Demandes actives à comparer avec les nouveaux arrivages.</p></div>
+          <div class="toolbar"><div class="filters"><button class="filter active" type="button" data-filter="all">Toutes · <span id="allCount">0</span></button><button class="filter" type="button" data-filter="exact">Match exact · <span id="exactCount">0</span></button><button class="filter" type="button" data-filter="near">Match proche · <span id="nearCount">0</span></button><button class="filter" type="button" data-filter="potential">Match potentiel · <span id="potentialCount">0</span></button><button class="filter" type="button" data-filter="wait">En attente · <span id="waitCount">0</span></button></div><div class="toolbar-right"><span class="scan" id="scanStatus">Aucun scan effectué</span><button class="analyze-btn" id="analyzeBtn" type="button">Analyser les matchs</button><input class="search" id="search" type="search" aria-label="Rechercher une fiche" placeholder="Modèle ou client…"></div></div>
+          <div id="records"><div class="empty" style="display:block">Chargement de la liste…</div></div><div class="empty" id="empty">Aucune fiche acheteur pour le moment. Ajoutez la première demande avec le formulaire.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <section class="view sales-view" id="salesView" aria-labelledby="resolved-title" hidden>
+    <div class="card resolved">
+      <div class="sales-summary" aria-live="polite"><strong id="salesCount">0</strong><span id="salesLabel">vente additionnelle</span></div>
+      <div class="resolved-head"><div><h2 id="resolved-title">Ventes conclues</h2><p>Les dossiers déplacés ici alimentent le compteur.</p></div><div class="resolved-count"><span id="resolvedCount">0</span> dossier réglé</div></div>
+      <div id="resolvedRecords"></div><div class="resolved-empty" id="resolvedEmpty">Aucune vente conclue à partir de la liste pour le moment.</div>
+    </div>
+  </section>
+
+</main>
+<div class="modal-overlay" id="matchModal" role="dialog" aria-modal="true" aria-labelledby="matchModalTitle"><div class="modal"><div class="modal-head"><h3 id="matchModalTitle">Matchs</h3><button class="modal-close" type="button" id="matchModalClose">Fermer ✕</button></div><div class="modal-body" id="matchModalBody"></div></div></div>
+<div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle"><div class="modal"><div class="modal-head"><h3 id="confirmModalTitle">Vous êtes sûr ?</h3><button class="modal-close" type="button" id="confirmModalClose">Fermer ✕</button></div><div class="modal-body"><p id="confirmModalText" style="margin:0 0 6px;font-size:.9rem"></p><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px"><button class="record-action" type="button" id="confirmCancel">Annuler</button><button class="record-action remove" type="button" id="confirmOk" style="background:#b71c1c;border-color:#b71c1c;color:#fff">Oui, jeter la fiche</button></div></div></div></div>
+<div class="undo" id="undo" role="status"><span>Dossier retiré.</span><button type="button" id="undoButton">Annuler</button></div>
+<script>
+(function(){
+  // URL de l'API Cloudflare (Worker + KV) — la liste se sauvegarde toute seule.
+  // Remplie automatiquement au déploiement.
+  var API_BASE = "https://liste-acheteurs-api.joey-carpentier.workers.dev";
+  function apiReady(){ return !!API_BASE && API_BASE.indexOf("https://") === 0; }
+
+  var buyers = [], matches = [], buyersById = {};
+  var filter = 'all', removedBuyer = null, undoTimer = null;
+  var search = document.getElementById('search');
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  var MARQUES = ["nissan","honda","toyota","mazda","hyundai","kia","ford","chevrolet","chevy","jeep","ram","gmc","volkswagen","vw","bmw","mercedes","audi","subaru","mitsubishi","acura","lexus","infiniti","volvo","tesla","dodge","chrysler","buick","cadillac","lincoln","porsche","mini","fiat"];
+  function splitMarque(modele){
+    var m = String(modele || "").trim(), parts = m.split(/\s+/);
+    if (parts.length > 1 && MARQUES.indexOf(parts[0].toLowerCase()) !== -1)
+      return { marque: parts[0], modele: m.slice(parts[0].length).trim() };
+    return { marque: "", modele: m };
+  }
+
+  function matchFor(b){
+    var best = null;
+    // Clé de jointure : lien Activix (repli sur l'ancien champ telephone pour les fiches legacy)
+    var bKey = String(b.activix || b.telephone || '');
+    matches.forEach(function(m){
+      var mKey = String(m.activix || m.telephone || '');
+      if (m.acheteur === b.nom && mKey === bKey){
+        if (!best || Number(m.score) > Number(best.score)) best = m;
+      }
+    });
+    return best;
+  }
+  var TIER_LABELS = {exact:'Match exact', near:'Match proche', potential:'Match potentiel', wait:'En attente'};
+  function matchTier(m){
+    if (!m) return 'wait';
+    if (m.proche) return 'near';
+    var s = Number(m.score);
+    // « Match exact » seulement si la finition et la couleur correspondent aussi
+    if (s >= 100 && !m.trim_mismatch && !m.couleur_mismatch) return 'exact';
+    if (s >= 80) return 'near';
+    return 'potential';
+  }
+  function pendingStatus(b){
+    return matchTier(matchFor(b));
+  }
+
+  function activeSide(status){
+    var labels = {exact:'Match exact', near:'Match proche', potential:'Match potentiel', wait:'En attente'};
+    return '<div class="record-side"><span class="status ' + status + '">' + labels[status] + '</span><div class="record-actions"><button class="record-action sale" type="button" data-action="sale">Vente conclue</button><button class="record-action remove" type="button" data-action="remove">Jeter</button></div></div>';
+  }
+  function resolvedSide(){
+    return '<div class="record-side"><span class="resolved-date">Vente conclue</span><div class="record-actions"><button class="record-action" type="button" data-action="restore">Remettre en attente</button><button class="record-action remove" type="button" data-action="remove">Jeter</button></div></div>';
+  }
+
+  function buyerMatches(b){
+    var n = (b.nom || '').toLowerCase().trim();
+    if (!n || !matches) return [];
+    return matches.filter(function(m){ return (m.acheteur || '').toLowerCase().trim() === n; });
+  }
+  function recordHTML(b, status, side){
+    var details = [];
+    if (b.marque) details.push(b.marque);
+    if (b.annees) details.push(b.annees);
+    if (b.budget) details.push('budget max. ' + b.budget);
+    if (b.km_max) details.push(String(b.km_max).replace(/\s*km$/i, '') + ' km max.');
+    if (b.couleurs) details.push(b.couleurs);
+    if (b.specs) details.push(b.specs);
+    var q = (b.nom + ' ' + b.modele + ' ' + b.marque + ' ' + b.vendeur + ' ' + details.join(' ')).toLowerCase();
+    var bm = buyerMatches(b);
+    var matchPill = bm.length ? '<button class="match-pill" type="button" data-matches-for="' + b.id + '">🎯 ' + bm.length + ' match' + (bm.length > 1 ? 's' : '') + ' — voir</button>' : '';
+    var ax = String(b.activix || '');
+    var axLink = /^https?:\/\//i.test(ax) ? '<a class="activix-link" href="' + esc(ax) + '" target="_blank" rel="noopener">Fiche Activix</a>' : '';
+    return '<article class="record" data-id="' + b.id + '" data-status="' + status + '" data-search="' + esc(q) + '">' +
+      '<div><h3>' + esc(b.nom) + ' · ' + esc(b.modele) + '</h3><p>' + esc(details.join(' · ')) + '</p>' +
+      axLink + matchPill + '</div>' +
+      '<div class="seller"><small>Vendeur responsable</small><strong>' + esc(b.vendeur) + '</strong></div>' + side + '</article>';
+  }
+
+  function renderMatches(){
+    var scanEl = document.getElementById('scanStatus');
+    if (scanEl) scanEl.textContent = matches.length ? 'Dernier scan : ' + matches[0].date : 'Aucun scan effectué';
+  }
+
+  function render(){
+    buyersById = {};
+    var pendingHTML = '', soldHTML = '';
+    buyers.forEach(function(b){
+      buyersById[b.id] = b;
+      if (b.statut === 'Vente conclue'){
+        soldHTML += recordHTML(b, 'sold', resolvedSide());
+      } else {
+        var st = pendingStatus(b);
+        pendingHTML += recordHTML(b, st, activeSide(st));
+      }
+    });
+    $('records').innerHTML = pendingHTML;
+    $('resolvedRecords').innerHTML = soldHTML;
+    renderMatches();
+    updateCounts();
+    apply();
+  }
+
+  function updateCounts(){
+    var records = document.querySelectorAll('#records .record'),
+        sales = document.querySelectorAll('#resolvedRecords .record').length;
+    $('allCount').textContent = records.length;
+    ['exact','near','potential','wait'].forEach(function(status){
+      $(status + 'Count').textContent = document.querySelectorAll('#records .record[data-status="' + status + '"]').length;
+    });
+    $('pendingCount').textContent = records.length;
+    $('pendingLabel').textContent = records.length === 1 ? 'fiche en attente' : 'fiches en attente';
+    $('pendingTabCount').textContent = records.length;
+    $('salesTabCount').textContent = sales;
+    $('salesCount').textContent = sales;
+    $('salesLabel').textContent = sales === 1 ? 'vente additionnelle' : 'ventes additionnelles';
+    $('resolvedCount').textContent = sales;
+    document.querySelector('.resolved-count').lastChild.textContent = sales === 1 ? ' dossier réglé' : ' dossiers réglés';
+    $('resolvedEmpty').style.display = sales ? 'none' : 'block';
+  }
+
+  function apply(){
+    var q = search.value.trim().toLowerCase(), shown = 0;
+    document.querySelectorAll('#records .record').forEach(function(r){
+      var ok = (filter === 'all' || r.dataset.status === filter) && (!q || r.dataset.search.indexOf(q) > -1);
+      r.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    var empty = $('empty');
+    empty.textContent = document.querySelectorAll('#records .record').length
+      ? 'Aucune fiche ne correspond à ce filtre.'
+      : 'Aucune fiche acheteur pour le moment. Ajoutez la première demande avec le formulaire.';
+    empty.style.display = shown ? 'none' : 'block';
+  }
+
+  function showError(msg){
+    var el = $('formError');
+    if (!msg){ el.style.display = 'none'; return; }
+    el.textContent = 'Erreur : ' + msg + ' — réessayez.';
+    el.style.display = 'block';
+  }
+
+  function apiCall(path, method, data){
+    showError('');
+    var opts = { method: method, headers: { "Content-Type": "application/json" } };
+    if (data) opts.body = JSON.stringify(data);
+    return fetch(API_BASE + path, opts).then(function(r){
+      return r.json();
+    }).then(function(j){
+      if (!j || !j.ok) throw new Error((j && j.error) || 'réponse invalide');
+      return j;
+    });
+  }
+  function apiAdd(b){ return apiCall('/api/acheteurs', 'POST', b); }
+  function apiSetStatus(id, statut){ return apiCall('/api/acheteurs/' + encodeURIComponent(id), 'PUT', { statut: statut }); }
+  function apiRemove(id){ return apiCall('/api/acheteurs/' + encodeURIComponent(id), 'DELETE'); }
+
+  function mNorm(s){
+    if (s == null) return '';
+    return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['"]/g, '').replace(/\s+/g, ' ').trim();
+  }
+  function mInt(s){
+    if (s == null) return null;
+    var d = String(s).replace(/[^\d]/g, '');
+    return d ? parseInt(d, 10) : null;
+  }
+  function mYears(s){
+    if (!s) return [null, null];
+    s = String(s);
+    var nums = (s.match(/\d{4}/g) || []).map(function(n){ return parseInt(n, 10); });
+    if (!nums.length) return [null, null];
+    if (nums.length === 1){
+      if (s.indexOf('+') !== -1 || /et plus/i.test(s)) return [nums[0], null];
+      return [nums[0], nums[0]];
+    }
+    return [Math.min.apply(null, nums), Math.max.apply(null, nums)];
+  }
+  function matchScore(a, v){
+    var raisons = [], score = 0, proche = false, trim_mismatch = false, couleur_mismatch = false;
+    var a_modele = mNorm(a.modele), v_modele = mNorm(v.modele);
+    var a_marque = mNorm(a.marque), v_marque = mNorm(v.marque);
+    if (!a_modele || !v_modele) return [0, [], false, false, false];
+    if (a_modele.indexOf(v_modele) === -1 && v_modele.indexOf(a_modele) === -1) return [0, [], false, false, false];
+    score += 50; raisons.push('modèle ' + v.marque + ' ' + v.modele);
+    if (a_marque && (a_marque.indexOf(v_marque) !== -1 || v_marque.indexOf(a_marque) !== -1)){ score += 10; raisons.push('marque OK'); }
+    var yr = mYears(a.annees), y_min = yr[0], y_max = yr[1], v_annee = mInt(v.annee);
+    if (v_annee){
+      if (y_min && v_annee < y_min) return [0, [], false];
+      if (y_max && v_annee > y_max) return [0, [], false];
+      if (y_min || y_max){ score += 20; raisons.push('année ' + v_annee + ' OK'); }
+    }
+    var budget = mInt(a.budget), v_prix = mInt(v.prix);
+    if (budget && v_prix){
+      if (v_prix > budget * 1.25) return [0, [], false, false, false];
+      if (v_prix > budget + 500){
+        score += 10; raisons.push('prix ' + v_prix + '$ légèrement au-dessus du budget (' + budget + '$)');
+        proche = true;
+      } else {
+        score += 20;
+        raisons.push(v_prix > budget ? 'prix ' + v_prix + '$ ≈ budget (' + (v_prix - budget) + '$ au-dessus)' : 'prix ' + v_prix + '$ ≤ budget');
+        if (v_prix <= budget * 0.9){ score += 5; raisons.push('sous le budget'); }
+      }
+    }
+    var km_max = mInt(a.km_max), v_km = mInt(v.km);
+    if (km_max && v_km){
+      if (v_km > km_max) return [0, [], false, false, false];
+      score += 10; raisons.push(v_km + ' km OK');
+    }
+    // Finition nommée dans le modèle recherché (ex. « rogue sl ») : bonus + la finition exacte sort en premier.
+    // Si une finition est nommée mais diffère de celle du véhicule -> pas un « match exact ».
+    var v_trim = mNorm(v.trim), a_words = {};
+    a_modele.split(' ').forEach(function(w){ if (w) a_words[w] = 1; });
+    var brand_words = {}, v_modele_words = {};
+    a_marque.split(' ').forEach(function(w){ if (w) brand_words[w] = 1; });
+    v_modele.split(' ').forEach(function(w){ if (w) v_modele_words[w] = 1; });
+    var sought = [];
+    Object.keys(a_words).forEach(function(w){ if (!brand_words[w] && !v_modele_words[w]) sought.push(w); });
+    var v_trim_words = v_trim ? v_trim.split(' ') : [];
+    var trim_hit = sought.some(function(w){ return v_trim_words.indexOf(w) !== -1; });
+    if (sought.length){
+      if (v_trim && trim_hit){
+        score += 20; raisons.push('finition ' + v.trim + ' recherchée');
+      } else {
+        trim_mismatch = true;
+        raisons.push('finition ' + (v.trim || '?') + ' ≠ ' + sought.join('/') + ' recherchée');
+      }
+    } else if (v_trim && v_trim_words.some(function(w){ return w && a_words[w]; })){
+      score += 20; raisons.push('finition ' + v.trim + ' recherchée');
+    }
+    // Couleur : si l'acheteur a exigé des couleurs et que celle du véhicule est connue
+    // mais n'en fait pas partie -> pas un « match exact ».
+    var accepted = [];
+    String(a.couleurs || '').split(/[,/;]/).forEach(function(part){
+      mNorm(part).split(/\bou\b|\bet\b/).forEach(function(w){ w = w.trim(); if (w) accepted.push(w); });
+    });
+    var v_couleur = mNorm(v.couleur);
+    if (accepted.length && v_couleur){
+      var cok = accepted.some(function(c){ return v_couleur.indexOf(c) !== -1 || c.indexOf(v_couleur) !== -1; });
+      if (!cok){
+        couleur_mismatch = true;
+        raisons.push('couleur ' + v.couleur + ' non acceptée (' + String(a.couleurs).trim() + ')');
+      }
+    }
+    return [score, raisons, proche, trim_mismatch, couleur_mismatch];
+  }
+  function runAnalysis(){
+    if (!apiReady()) return;
+    var btn = $('analyzeBtn');
+    btn.disabled = true;
+    btn.textContent = 'Analyse en cours…';
+    var done = function(msg, okText){
+      btn.disabled = false;
+      btn.textContent = okText || 'Analyser les matchs';
+      if (msg) showError(msg);
+      if (okText) setTimeout(function(){ btn.textContent = 'Analyser les matchs'; }, 3000);
+    };
+    apiCall('/api/inventaire', 'GET').then(function(inv){
+      var items = (inv && inv.inventaire) || [];
+      if (!items.length) throw new Error("inventaire indisponible — réessayez après le scan du matin");
+      var out = [], today = new Date().toISOString().slice(0, 10);
+      buyers.forEach(function(a){
+        var st = mNorm(a.statut);
+        if (st && ['en attente', 'actif', 'nouveau', ''].indexOf(st) === -1) return;
+        items.forEach(function(v){
+          var r = matchScore(a, v);
+          if (r[0] >= 50){
+            out.push({
+              acheteur: a.nom, activix: (a.activix || a.telephone || ''), vendeur: a.vendeur,
+              vehicule: ((v.annee || '') + ' ' + (v.marque || '') + ' ' + (v.modele || '') + ' ' + (v.trim || '')).replace(/\s+/g, ' ').trim(),
+              stock: v.stock, prix: v.prix, km: v.km, url: v.url,
+              score: r[0], raisons: r[1], proche: r[2], trim_mismatch: r[3], couleur_mismatch: r[4], date: today
+            });
+          }
+        });
+      });
+      out.sort(function(x, y){ return (y.score - x.score) || String(x.acheteur || '').localeCompare(String(y.acheteur || '')); });
+      matches = out;
+      render();
+      return apiCall('/api/matchs', 'POST', { matchs: out });
+    }).then(function(){ done(null, '✓ ' + matches.length + ' matchs'); }).catch(function(err){ done(err.message); });
+  }
+
+  function loadData(){
+    if (!apiReady()) return;
+    fetch(API_BASE + '/api/acheteurs').then(function(r){ return r.json(); }).then(function(j){
+      buyers = j.buyers || [];
+      matches = j.matchs || [];
+      render();
+    }).catch(function(){
+      $('records').innerHTML = '<div class="empty" style="display:block">Impossible de charger la liste. Vérifiez la connexion puis rechargez la page.</div>';
+    });
+  }
+
+  function showUndo(b){
+    removedBuyer = b;
+    var undo = $('undo');
+    undo.style.display = 'flex';
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(function(){ undo.style.display = 'none'; removedBuyer = null; }, 5000);
+  }
+
+  document.querySelectorAll('.view-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.view-tab').forEach(function(t){
+        var active = t === tab;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-pressed', active ? 'true' : 'false');
+        $(t.dataset.viewTarget).hidden = !active;
+      });
+    });
+  });
+  document.querySelectorAll('.filter').forEach(function(f){
+    f.addEventListener('click', function(){
+      filter = f.dataset.filter;
+      document.querySelectorAll('.filter').forEach(function(x){ x.classList.toggle('active', x === f); });
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+
+  $('undoButton').addEventListener('click', function(){
+    if (!removedBuyer || !apiReady()) return;
+    var b = removedBuyer;
+    removedBuyer = null;
+    $('undo').style.display = 'none';
+    clearTimeout(undoTimer);
+    apiAdd(b).then(loadData).catch(function(err){ showError(err.message); });
+  });
+
+  document.addEventListener('click', function(e){
+    var button = e.target.closest('[data-action]');
+    if (!button || !apiReady()) return;
+    var record = button.closest('.record');
+    if (!record) return;
+    var id = record.dataset.id;
+    var done = function(){ loadData(); };
+    var fail = function(err){ showError(err.message); };
+    if (button.dataset.action === 'sale') apiSetStatus(id, 'Vente conclue').then(done).catch(fail);
+    if (button.dataset.action === 'restore') apiSetStatus(id, 'En attente').then(done).catch(fail);
+    if (button.dataset.action === 'remove'){
+      openConfirm(id);
+      return;
+    }
+  });
+
+  var pendingRemoveId = null;
+  function openConfirm(id){
+    var b = buyersById[id];
+    pendingRemoveId = id;
+    $('confirmModalText').textContent = 'Voulez-vous vraiment jeter la fiche de ' + (b && b.nom ? b.nom : 'cet acheteur') + ' ? Cette action est définitive.';
+    $('confirmModal').classList.add('open');
+  }
+  function closeConfirm(){
+    $('confirmModal').classList.remove('open');
+    pendingRemoveId = null;
+  }
+  function doRemove(){
+    var id = pendingRemoveId;
+    closeConfirm();
+    if (!id || !apiReady()) return;
+    var b = buyersById[id];
+    apiRemove(id).then(function(){ showUndo(b); loadData(); }).catch(function(err){ showError(err.message); });
+  }
+
+  function openMatches(id){
+    var b = buyersById[id];
+    if (!b) return;
+    var list = buyerMatches(b);
+    $('matchModalTitle').textContent = 'Matchs pour ' + b.nom;
+    $('matchModalBody').innerHTML = list.map(function(m){
+      var tier = matchTier(m);
+      return '<div class="modal-match"><h4>' + esc(m.vehicule) + '</h4>' +
+        '<div style="margin:5px 0"><span class="status ' + tier + '">' + TIER_LABELS[tier] + '</span></div>' +
+        (m.raisons && m.raisons.length ? '<div class="spec">' + esc(m.raisons.join(' · ')) + '</div>' : '') +
+        '<div class="spec">' + esc(m.prix) + ' · ' + esc(m.km) + '</div>' +
+        '<div class="stock">Stock ' + esc(m.stock) + '</div>' +
+        (m.proche ? '<div class="stock">Match proche : prix légèrement au-dessus du budget</div>' : '') +
+        (m.url ? '<a class="match-badge" href="' + esc(m.url) + '" target="_blank" rel="noopener">Voir la fiche</a>' : '') +
+        '</div>';
+    }).join('');
+    $('matchModal').classList.add('open');
+  }
+  function closeMatches(){ $('matchModal').classList.remove('open'); }
+  document.addEventListener('click', function(e){
+    var pill = e.target.closest('[data-matches-for]');
+    if (pill){ openMatches(pill.getAttribute('data-matches-for')); return; }
+    if (e.target.closest('#matchModalClose') || e.target === $('matchModal')) closeMatches();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ closeMatches(); closeConfirm(); }
+  });
+  $('confirmOk').addEventListener('click', doRemove);
+  $('confirmCancel').addEventListener('click', closeConfirm);
+  $('confirmModalClose').addEventListener('click', closeConfirm);
+  $('confirmModal').addEventListener('click', function(e){
+    if (e.target === $('confirmModal')) closeConfirm();
+  });
+
+  var form = $('buyerForm');
+  if (!apiReady()){
+    $('setupBanner').hidden = false;
+    form.querySelector('.primary').disabled = true;
+    $('analyzeBtn').disabled = true;
+  }
+  $('analyzeBtn').addEventListener('click', runAnalysis);
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!apiReady()) return;
+    var v = function(id){ return $(id).value.trim(); };
+    var ax = v('activix');
+    if (!ax){ showError('Le lien Activix est obligatoire.'); return; }
+    if (!/^https?:\/\//i.test(ax)) ax = 'https://' + ax;
+    var parts = splitMarque(v('model'));
+    var b = {
+      nom: v('client'), activix: ax,
+      modele: parts.modele, marque: parts.marque,
+      annees: v('years'), budget: v('budget'), couleurs: v('colors'),
+      km_max: v('maxKm'), specs: v('specs'), vendeur: v('seller')
+    };
+    apiAdd(b).then(function(){
+      $('success').style.display = 'block';
+      form.reset();
+      filter = 'all';
+      document.querySelectorAll('.filter').forEach(function(x){ x.classList.toggle('active', x.dataset.filter === 'all'); });
+      loadData();
+    }).catch(function(err){ showError(err.message); });
+  });
+
+  loadData();
+})();
+</script>
+</body>
+</html>
